@@ -17,12 +17,15 @@ def post_list(request):
 
 def concrete_post(request):
     
-    if request.method == 'GET':
-        post_id = request.GET.get('id')
-        if post_id:
-            post = Post.objects.filter(id=post_id).first()
-            form = DeleteForm()
-            if post:
+    post_id = request.GET.get('id')
+    if post_id:
+
+        post = Post.objects.filter(id=post_id).first()
+        if post:
+            
+            if request.method == 'GET':
+                
+                form = DeleteForm()
                 return render(request, 'concrete-post.html', 
                     {
                         'post': post,
@@ -34,9 +37,12 @@ def concrete_post(request):
 
 
 def delete_post(request):
-    if request.method == 'POST':
-        post_id = request.POST.get('id')
-        if post_id:
+
+    post_id = request.POST.get('id')
+
+    if post_id:
+
+        if request.method == 'POST':
             Post.objects.filter(id=post_id).delete()
             
             return HttpResponse(f'Post id={post_id} has been deleted')
@@ -45,21 +51,21 @@ def delete_post(request):
 
 def edit_post(request):
 
-    if request.method == 'GET':
-        post_id = request.GET.get('id')
-        if post_id:
-            post = Post.objects.filter(id=post_id).first()
+    post_id = request.POST.get('id')
+
+    if post_id:
+        post_query = Post.objects.filter(id=post_id)
+
+        if request.method == 'GET':
+            post = post_query.first()
             return render(request, 'edit_post.html', 
                 {'post': post, 'edit_form': PostForm(model_to_dict(post))}
             )
 
-    if request.method == 'POST':
-        post_id = request.POST.get('id')
-        if post_id:
-            post = Post.objects.filter(id=post_id)
+        if request.method == 'POST':
             form = PostForm(request.POST)
             if form.is_valid():
-                post.update(**form.cleaned_data)
+                post_query.update(**form.cleaned_data)
 
     raise Http404
 

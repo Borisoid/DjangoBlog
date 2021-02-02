@@ -19,8 +19,21 @@
     </p>
     <p>{{ post.short_description }}</p>
     <p>{{ post.text }}</p>
-    <img src="{{ post.image.url }}" alt="image missing">
 
+    {% if post.image  %}
+    <img src="{{ post.image.url }}" alt="image missing">
+    {% else %}
+    <span>No Image</span>
+    {% endif %}
+
+    <!-- <form method="post">
+        {% csrf_token %}
+        {{ delete_form.as_table }}
+        <button type="submit">Delete</button>
+    </form> -->
+    <a href="{% url 'delete_post' %}?id={{post.id}}">Delete</a>
+
+    <a href="{% url 'edit_post' %}?id={{post.id}}">Edit</a>
 
 </body>
 </html>

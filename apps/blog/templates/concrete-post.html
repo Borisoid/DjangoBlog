@@ -26,14 +26,13 @@
     <span>No Image</span>
     {% endif %}
 
-    <!-- <form method="post">
+    <form method="post" action="{% url 'delete_post' %}">
         {% csrf_token %}
         {{ delete_form.as_table }}
+        <input type="hidden" name="id" value="{{ post.id }}">
         <button type="submit">Delete</button>
-    </form> -->
-    <a href="{% url 'delete_post' %}?id={{post.id}}">Delete</a>
-
-    <a href="{% url 'edit_post' %}?id={{post.id}}">Edit</a>
+    </form>
+    
 
 </body>
 </html>

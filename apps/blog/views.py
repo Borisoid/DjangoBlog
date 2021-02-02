@@ -5,6 +5,9 @@ from .models import(
     Post,
 )
 
+from .forms import(
+    DeleteForm,
+)
 
 
 def post_list(request):
@@ -16,20 +19,24 @@ def concrete_post(request):
         post_id = request.GET.get('id')
         if post_id:
             post = Post.objects.filter(id=post_id).first()
+            form = DeleteForm()
             if post:
                 return render(request, 'concrete-post.html', 
-                    {'post': post,}
+                    {
+                        'post': post,
+                        'delete_form': form
+                    }
                 )
         
-        raise Http404
+    raise Http404
 
 def delete_post(request):
-    if request.method == 'GET':
-        post_id = request.GET.get('id')
+    if request.method == 'POST':
+        post_id = request.POST.get('id')
         if post_id:
             Post.objects.filter(id=post_id).delete()
             
-            return HttpResponse('Deleted')
+            return HttpResponse(f'Post id={post_id} has been deleted')
 
     raise Http404
 

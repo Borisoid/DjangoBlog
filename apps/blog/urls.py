@@ -5,7 +5,7 @@ from .views import (
    concrete_post,
    add_post,
    delete_post,
-   edit_post
+   edit_post,
 )
 
 urlpatterns = [

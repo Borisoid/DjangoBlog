@@ -7,11 +7,11 @@
 </head>
 <body>
     
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ edit_form.as_p }}
+        {{ form.as_p }}
         <input type="hidden" name="id" value="{{ post.id }}">
-        <button type="submit">Edit</button>
+        <button type="submit">Submit</button>
     </form>
 
 </body>

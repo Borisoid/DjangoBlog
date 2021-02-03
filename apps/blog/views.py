@@ -65,7 +65,6 @@ def edit_post(request):
         if request.method == 'POST':
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
-                print(request.FILES)
                 
                 tags = form.cleaned_data.pop('tags')
 
@@ -88,7 +87,6 @@ def add_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-            print(request.FILES)
 
             tags = form.cleaned_data.pop('tags')
 

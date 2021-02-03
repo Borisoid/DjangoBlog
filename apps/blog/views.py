@@ -7,7 +7,7 @@ from .models import(
 )
 
 from .forms import(
-    DeleteForm,
+    DeleteForm, 
     PostForm,
 )
 
@@ -58,14 +58,21 @@ def edit_post(request):
 
         if request.method == 'GET':
             post = post_query.first()
-            return render(request, 'edit_post.html', 
-                {'post': post, 'edit_form': PostForm(model_to_dict(post))}
+            return render(request, 'post_form.html', 
+                {'post': post, 'form': PostForm(model_to_dict(post, exclude='image'))}
             )
 
         if request.method == 'POST':
-            form = PostForm(request.POST)
+            form = PostForm(request.POST, request.FILES)
             if form.is_valid():
+                print(request.FILES)
+                
+                tags = form.cleaned_data.pop('tags')
+
                 post_query.update(**form.cleaned_data)
+                post = post_query.first()
+                post.tags.clear()
+                post.tags.add(*tags)
 
                 return HttpResponse(f'Post id={post_id} has been edited')
 
@@ -73,4 +80,24 @@ def edit_post(request):
 
 
 def add_post(request):
-    raise NotImplementedError
+    if request.method == 'GET':
+        return render(request, 'post_form.html',
+            {'form': PostForm()}
+        )
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            print(request.FILES)
+
+            tags = form.cleaned_data.pop('tags')
+
+            post = Post(**form.cleaned_data)
+            post.save()
+            post.tags.add(*tags)
+
+            return HttpResponse(f'Post id = {post.id} has been created')
+
+    raise Http404
+
+

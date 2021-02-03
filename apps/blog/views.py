@@ -51,7 +51,7 @@ def delete_post(request):
 
 def edit_post(request):
 
-    post_id = request.POST.get('id')
+    post_id = request.GET.get('id')
 
     if post_id:
         post_query = Post.objects.filter(id=post_id)
@@ -66,6 +66,8 @@ def edit_post(request):
             form = PostForm(request.POST)
             if form.is_valid():
                 post_query.update(**form.cleaned_data)
+
+                return HttpResponse(f'Post id={post_id} has been edited')
 
     raise Http404
 

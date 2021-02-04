@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %} BLOG {% endblock %}
+
+{% block content %}
+    
+    <form method="get">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+
+    <hr>
+    
+    {% if posts %}
+        {% for post in posts %}
+        <a href="{% url 'concrete_post' %}?id={{ post.id }}">{{ post }}</a>
+        <hr>
+        {% endfor %}
+    {% else %}
+        Nothing found
+    {% endif %}
+
+{% endblock %}

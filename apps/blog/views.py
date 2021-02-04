@@ -7,13 +7,40 @@ from .models import(
 )
 
 from .forms import(
-    DeleteForm,
+    DeleteForm, 
     PostForm,
+    SearchForm,
 )
 
 
 def post_list(request):
-    raise NotImplementedError
+    if request.method == 'GET':
+
+        posts = Post.objects
+
+        if 'csrfmiddlewaretoken' in request.GET:
+
+            search_form = SearchForm(request.GET)
+            if search_form.is_valid():
+                
+                lookup = {
+                    'tags': 'tags__in', 
+                    'header': 'header__icontains', 
+                    'short_description': 'short_description__icontains',
+                }
+
+                filter_dict = {
+                    lookup.get(key, key) : value 
+                    for key, value 
+                    in search_form.cleaned_data.items() 
+                    if value
+                }
+
+                posts = posts.filter(**filter_dict)
+
+        return render(request, 'post_list.html', {'posts': posts.all(), 'form': SearchForm()})
+
+    raise Http404
 
 def concrete_post(request):
     
@@ -26,7 +53,7 @@ def concrete_post(request):
             if request.method == 'GET':
                 
                 form = DeleteForm()
-                return render(request, 'concrete-post.html', 
+                return render(request, 'concrete_post.html', 
                     {
                         'post': post,
                         'delete_form': form
@@ -51,24 +78,42 @@ def delete_post(request):
 
 def edit_post(request):
 
-    post_id = request.POST.get('id')
+    post_id = request.GET.get('id')
 
     if post_id:
         post_query = Post.objects.filter(id=post_id)
 
         if request.method == 'GET':
             post = post_query.first()
-            return render(request, 'edit_post.html', 
-                {'post': post, 'edit_form': PostForm(model_to_dict(post))}
+            return render(request, 'post_form.html', 
+                {'post': post, 'form': PostForm(model_to_dict(post, exclude='image'))}
             )
 
         if request.method == 'POST':
-            form = PostForm(request.POST)
+            form = PostForm(request.POST, request.FILES)
             if form.is_valid():
-                post_query.update(**form.cleaned_data)
+
+                post = Post.m2m_from_form(form.cleaned_data, id=post_id)
+
+                return HttpResponse(f'Post id={post.id} has been edited')
 
     raise Http404
 
 
 def add_post(request):
-    raise NotImplementedError
+    if request.method == 'GET':
+        return render(request, 'post_form.html',
+            {'form': PostForm()}
+        )
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            post = Post.m2m_from_form(form.cleaned_data)
+
+            return HttpResponse(f'Post id = {post.id} has been created')
+
+    raise Http404
+
+

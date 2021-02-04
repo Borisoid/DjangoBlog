@@ -65,13 +65,13 @@ def edit_post(request):
         if request.method == 'POST':
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
-                
+
                 tags = form.cleaned_data.pop('tags')
 
-                post_query.update(**form.cleaned_data)
-                post = post_query.first()
-                post.tags.clear()
-                post.tags.add(*tags)
+                post = Post(**form.cleaned_data)
+                post.id = post_id
+                post.save()
+                post.tags.set(tags)
 
                 return HttpResponse(f'Post id={post_id} has been edited')
 
@@ -92,7 +92,7 @@ def add_post(request):
 
             post = Post(**form.cleaned_data)
             post.save()
-            post.tags.add(*tags)
+            post.tags.set(tags)
 
             return HttpResponse(f'Post id = {post.id} has been created')
 

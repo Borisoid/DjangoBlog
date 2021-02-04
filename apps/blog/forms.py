@@ -1,6 +1,7 @@
 from django import forms
 
 from .models import(
+    Category, 
     Post,
     Tag,
 )
@@ -25,4 +26,21 @@ class PostForm(forms.ModelForm):
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple
+    )
+
+class SearchForm(forms.Form):
+    tags = forms.ModelMultipleChoiceField(
+        queryset=Tag.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+    category = forms.ModelChoiceField(Category.objects, required=False)
+
+    header = forms.CharField(
+        max_length=Post._meta.get_field('header').max_length, 
+        required=False
+    )
+    short_description = forms.CharField(
+        max_length=Post._meta.get_field('short_description').max_length, 
+        required=False
     )

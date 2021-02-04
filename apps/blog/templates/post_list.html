@@ -7,18 +7,22 @@
 </head>
 <body>
     
-    <form method="get" enctype="application/x-www-form-urlencoded">
+    <form method="get">
         {% csrf_token %}
-        {{ form.as_table }}
+        {{ form.as_p }}
         <button type="submit">Submit</button>
     </form>
 
     <br>
     
-    {% for post in posts %}
-    <a href="{% url 'concrete_post' %}?id={{ post.id }}">{{ post }}</a>
-    <br>
-    {% endfor %}
+    {% if posts %}
+        {% for post in posts %}
+        <a href="{% url 'concrete_post' %}?id={{ post.id }}">{{ post }}</a>
+        <br>
+        {% endfor %}
+    {% else %}
+        Nothing found
+    {% endif %}
 
 </body>
 </html>

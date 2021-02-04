@@ -9,6 +9,7 @@ from .models import(
 from .forms import(
     DeleteForm, 
     PostForm,
+    SearchForm,
 )
 
 
@@ -17,7 +18,27 @@ def post_list(request):
 
         posts = Post.objects
 
-        return render(request, 'post_list.html', {'posts': posts.all()})
+        if 'csrfmiddlewaretoken' in request.GET:
+
+            search_form = SearchForm(request.GET)
+            if search_form.is_valid():
+                
+                lookup = {
+                    'tags': 'tags__in', 
+                    'header': 'header__icontains', 
+                    'short_description': 'short_description__icontains',
+                }
+
+                filter_dict = {
+                    lookup.get(key, key) : value 
+                    for key, value 
+                    in search_form.cleaned_data.items() 
+                    if value
+                }
+
+                posts = posts.filter(**filter_dict)
+
+        return render(request, 'post_list.html', {'posts': posts.all(), 'form': SearchForm()})
 
     raise Http404
 

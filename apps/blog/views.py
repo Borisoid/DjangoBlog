@@ -66,14 +66,9 @@ def edit_post(request):
             form = PostForm(request.POST, request.FILES)
             if form.is_valid():
 
-                tags = form.cleaned_data.pop('tags')
+                post = Post.m2m_from_form(form.cleaned_data, id=post_id)
 
-                post = Post(**form.cleaned_data)
-                post.id = post_id
-                post.save()
-                post.tags.set(tags)
-
-                return HttpResponse(f'Post id={post_id} has been edited')
+                return HttpResponse(f'Post id={post.id} has been edited')
 
     raise Http404
 
@@ -88,11 +83,7 @@ def add_post(request):
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
 
-            tags = form.cleaned_data.pop('tags')
-
-            post = Post(**form.cleaned_data)
-            post.save()
-            post.tags.set(tags)
+            post = Post.m2m_from_form(form.cleaned_data)
 
             return HttpResponse(f'Post id = {post.id} has been created')
 

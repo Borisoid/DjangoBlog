@@ -53,7 +53,7 @@ def concrete_post(request):
             if request.method == 'GET':
                 
                 form = DeleteForm()
-                return render(request, 'concrete-post.html', 
+                return render(request, 'concrete_post.html', 
                     {
                         'post': post,
                         'delete_form': form

@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blog</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %} BLOG {% endblock %}
+
+{% block content %}
     
     <form method="get">
         {% csrf_token %}
@@ -13,16 +10,15 @@
         <button type="submit">Submit</button>
     </form>
 
-    <br>
+    <hr>
     
     {% if posts %}
         {% for post in posts %}
         <a href="{% url 'concrete_post' %}?id={{ post.id }}">{{ post }}</a>
-        <br>
+        <hr>
         {% endfor %}
     {% else %}
         Nothing found
     {% endif %}
 
-</body>
-</html>
+{% endblock %}

@@ -13,7 +13,13 @@ from .forms import(
 
 
 def post_list(request):
-    raise NotImplementedError
+    if request.method == 'GET':
+
+        posts = Post.objects
+
+        return render(request, 'post_list.html', {'posts': posts.all()})
+
+    raise Http404
 
 def concrete_post(request):
     

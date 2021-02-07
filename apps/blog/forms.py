@@ -26,15 +26,14 @@ class PostForm(forms.ModelForm):
 
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
-        blank=True,
+        required=False,
     )
 
 
 class SearchForm(forms.Form):
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False
+        required=False,
     )
 
     category = forms.ModelChoiceField(Category.objects, required=False)

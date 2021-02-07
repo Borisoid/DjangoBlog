@@ -26,7 +26,7 @@ class Post(models.Model):
     image = models.ImageField(
         upload_to='static/uploaded_images', null=True, blank=True)
 
-    tags = models.ManyToManyField(to=Tag, blank=True)
+    tags = models.ManyToManyField(to=Tag)
 
     category = models.ForeignKey(
         to=Category, default=None, on_delete=models.CASCADE)

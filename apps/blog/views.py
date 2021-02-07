@@ -2,12 +2,12 @@ from django.shortcuts import render
 from django.http import Http404, HttpResponse
 from django.forms.models import model_to_dict
 
-from .models import(
+from .models import (
     Post,
 )
 
-from .forms import(
-    DeleteForm, 
+from .forms import (
+    DeleteForm,
     PostForm,
     SearchForm,
 )
@@ -22,44 +22,46 @@ def post_list(request):
 
             search_form = SearchForm(request.GET)
             if search_form.is_valid():
-                
+
                 lookup = {
-                    'tags': 'tags__in', 
-                    'header': 'header__icontains', 
+                    'tags': 'tags__in',
+                    'header': 'header__icontains',
                     'short_description': 'short_description__icontains',
                 }
 
                 filter_dict = {
-                    lookup.get(key, key) : value 
-                    for key, value 
-                    in search_form.cleaned_data.items() 
+                    lookup.get(key, key): value
+                    for key, value
+                    in search_form.cleaned_data.items()
                     if value
                 }
 
                 posts = posts.filter(**filter_dict)
 
-        return render(request, 'post_list.html', {'posts': posts.all(), 'form': SearchForm()})
+        return render(
+            request, 'post_list.html',
+            {'posts': posts.all(), 'form': SearchForm()}
+        )
 
     raise Http404
 
+
 def concrete_post(request):
-    
+
     post_id = request.GET.get('id')
     if post_id:
 
         post = Post.objects.filter(id=post_id).first()
         if post:
-            
+
             if request.method == 'GET':
-                
+
                 form = DeleteForm()
-                return render(request, 'concrete_post.html', 
-                    {
-                        'post': post,
-                        'delete_form': form
-                    }
+                return render(
+                    request, 'concrete_post.html',
+                    {'post': post, 'delete_form': form}
                 )
-        
+
     raise Http404
 
 
@@ -71,10 +73,11 @@ def delete_post(request):
 
         if request.method == 'POST':
             Post.objects.filter(id=post_id).delete()
-            
+
             return HttpResponse(f'Post id={post_id} has been deleted')
 
     raise Http404
+
 
 def edit_post(request):
 
@@ -85,8 +88,10 @@ def edit_post(request):
 
         if request.method == 'GET':
             post = post_query.first()
-            return render(request, 'post_form.html', 
-                {'post': post, 'form': PostForm(model_to_dict(post, exclude='image'))}
+            return render(
+                request, 'post_form.html',
+                {'post': post,
+                 'form': PostForm(model_to_dict(post, exclude='image'))}
             )
 
         if request.method == 'POST':
@@ -102,9 +107,7 @@ def edit_post(request):
 
 def add_post(request):
     if request.method == 'GET':
-        return render(request, 'post_form.html',
-            {'form': PostForm()}
-        )
+        return render(request, 'post_form.html', {'form': PostForm()})
 
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
@@ -115,5 +118,3 @@ def add_post(request):
             return HttpResponse(f'Post id = {post.id} has been created')
 
     raise Http404
-
-

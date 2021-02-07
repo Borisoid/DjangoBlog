@@ -26,6 +26,7 @@ class PostForm(forms.ModelForm):
 
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
+        widget=forms.SelectMultiple,
         required=False,
     )
 
@@ -33,6 +34,7 @@ class PostForm(forms.ModelForm):
 class SearchForm(forms.Form):
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
+        widget=forms.SelectMultiple,
         required=False,
     )
 

@@ -9,9 +9,9 @@ from .views import (
 )
 
 urlpatterns = [
-    path('add/', add_post),
-    path('post/edit/', edit_post, name='edit_post'),
-    path('post/delete/', delete_post, name='delete_post'),
-    path('post/', concrete_post, name='concrete_post'),
-    path('', post_list),
+    path('post/add/', add_post, name='add_post'),
+    path('post/edit/<int:post_id>/', edit_post, name='edit_post'),
+    path('post/delete/<int:post_id>/', delete_post, name='delete_post'),
+    path('post/view/<int:post_id>/', concrete_post, name='concrete_post'),
+    path('', post_list, name='post_list'),
 ]

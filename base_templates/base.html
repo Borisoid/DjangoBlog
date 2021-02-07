@@ -7,6 +7,11 @@
 </head>
 <body>
     
+    <header>
+        <a href="{% url 'post_list' %}">Post list</a>
+        <a href="{% url 'add_post' %}">Add post</a>
+    </header>
+
     {% block content %}
     {% endblock %}
 

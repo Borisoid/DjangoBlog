@@ -6,6 +6,5 @@ from .models import (
     Post,
 )
 
-
 admin.site.register(Tag)
 admin.site.register(Category)

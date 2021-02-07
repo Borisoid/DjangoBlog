@@ -1,5 +1,8 @@
-from django.shortcuts import render
-from django.http import Http404, HttpResponse
+from django.shortcuts import (
+    render,
+    redirect,
+)
+from django.http import Http404
 from django.forms.models import model_to_dict
 
 from .models import (
@@ -46,61 +49,51 @@ def post_list(request):
     raise Http404
 
 
-def concrete_post(request):
+def concrete_post(request, post_id: int):
 
-    post_id = request.GET.get('id')
-    if post_id:
-
-        post = Post.objects.filter(id=post_id).first()
-        if post:
-
-            if request.method == 'GET':
-
-                form = DeleteForm()
-                return render(
-                    request, 'concrete_post.html',
-                    {'post': post, 'delete_form': form}
-                )
-
-    raise Http404
-
-
-def delete_post(request):
-
-    post_id = request.POST.get('id')
-
-    if post_id:
-
-        if request.method == 'POST':
-            Post.objects.filter(id=post_id).delete()
-
-            return HttpResponse(f'Post id={post_id} has been deleted')
-
-    raise Http404
-
-
-def edit_post(request):
-
-    post_id = request.GET.get('id')
-
-    if post_id:
-        post_query = Post.objects.filter(id=post_id)
+    post = Post.objects.filter(id=post_id).first()
+    if post:
 
         if request.method == 'GET':
-            post = post_query.first()
+
+            form = DeleteForm()
             return render(
-                request, 'post_form.html',
-                {'post': post,
-                 'form': PostForm(model_to_dict(post, exclude='image'))}
+                request, 'concrete_post.html',
+                {'post': post, 'delete_form': form}
             )
 
-        if request.method == 'POST':
-            form = PostForm(request.POST, request.FILES)
-            if form.is_valid():
+    raise Http404
 
-                post = Post.m2m_from_form(form.cleaned_data, id=post_id)
 
-                return HttpResponse(f'Post id={post.id} has been edited')
+def delete_post(request, post_id: int):
+
+    if request.method == 'POST':
+        Post.objects.filter(id=post_id).delete()
+
+        return redirect('post_list')
+
+    raise Http404
+
+
+def edit_post(request, post_id: int):
+
+    post_query = Post.objects.filter(id=post_id)
+
+    if request.method == 'GET':
+        post = post_query.first()
+        return render(
+            request, 'post_form.html',
+            {'post': post,
+                'form': PostForm(model_to_dict(post, exclude='image'))}
+        )
+
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+
+            post = Post.m2m_from_form(form.cleaned_data, id=post_id)
+
+            return redirect('concrete_post', post_id=post_id)
 
     raise Http404
 
@@ -115,6 +108,6 @@ def add_post(request):
 
             post = Post.m2m_from_form(form.cleaned_data)
 
-            return HttpResponse(f'Post id = {post.id} has been created')
+            return redirect('concrete_post', post_id=post.id)
 
     raise Http404

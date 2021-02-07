@@ -90,7 +90,7 @@ def edit_post(request, post_id: int):
             return render(
                 request, 'post_form.html',
                 {'post': post,
-                 'form': PostForm(model_to_dict(post))}
+                 'post_form': PostForm(model_to_dict(post))}
             )
 
         if request.method == 'POST':
@@ -105,7 +105,7 @@ def edit_post(request, post_id: int):
 
 def add_post(request):
     if request.method == 'GET':
-        return render(request, 'post_form.html', {'form': PostForm()})
+        return render(request, 'post_form.html', {'post_form': PostForm()})
 
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)

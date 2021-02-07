@@ -33,17 +33,3 @@ class Post(models.Model):
 
     def __str__(self):
         return f'{self.header}   ---   {self.short_description}'
-
-    @classmethod
-    def m2m_from_form(self, cleaned_data, id=None):
-        tags = cleaned_data.pop('tags')
-
-        post = Post(**cleaned_data)
-
-        if id:
-            post.id = id
-
-        post.save()
-        post.tags.set(tags)
-
-        return post

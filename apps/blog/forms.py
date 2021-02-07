@@ -40,12 +40,7 @@ class SearchForm(forms.Form):
 
     category = forms.ModelChoiceField(Category.objects, required=False)
 
-    header = forms.CharField(
-        max_length=Post._meta.get_field('header').max_length,
-        required=False
-    )
-
-    short_description = forms.CharField(
-        max_length=Post._meta.get_field('short_description').max_length,
+    search_keywords = forms.CharField(
+        max_length=300,
         required=False
     )

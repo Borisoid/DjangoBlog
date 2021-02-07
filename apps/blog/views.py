@@ -1,9 +1,11 @@
+from django.http.response import HttpResponseBadRequest
 from django.shortcuts import (
     render,
     redirect,
 )
 from django.http import Http404
 from django.forms.models import model_to_dict
+from django.db.models import Q
 
 from .models import (
     Post,
@@ -21,32 +23,36 @@ def post_list(request):
 
         posts = Post.objects
 
-        if 'csrfmiddlewaretoken' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            filter_dict = {
+                key: value
+                for key, value
+                in search_form.cleaned_data.items()
+                if value
+            }
 
-            search_form = SearchForm(request.GET)
-            if search_form.is_valid():
+            search_keywords = filter_dict.pop('search_keywords', None)
+            if search_keywords:
+                posts = posts.filter(
+                    Q(header__icontains=search_keywords)
+                    | Q(short_description__icontains=search_keywords)
+                )
 
-                lookup = {
-                    'tags': 'tags__in',
-                    'header': 'header__icontains',
-                    'short_description': 'short_description__icontains',
-                }
+            if filter_dict.get('tags'):
+                filter_dict['tags__in'] = filter_dict.pop('tags')
 
-                filter_dict = {
-                    lookup.get(key, key): value
-                    for key, value
-                    in search_form.cleaned_data.items()
-                    if value
-                }
+            posts = posts.filter(**filter_dict).distinct()
 
-                posts = posts.filter(**filter_dict).distinct()
+        else:
+            return HttpResponseBadRequest
 
         return render(
             request, 'post_list.html',
             {'posts': posts.all(), 'form': SearchForm()}
         )
 
-    raise Http404
+    return HttpResponseBadRequest
 
 
 def concrete_post(request, post_id: int):
@@ -77,23 +83,22 @@ def delete_post(request, post_id: int):
 
 def edit_post(request, post_id: int):
 
-    post_query = Post.objects.filter(id=post_id)
+    post: Post = Post.objects.filter(id=post_id).first()
+    if post:
 
-    if request.method == 'GET':
-        post = post_query.first()
-        return render(
-            request, 'post_form.html',
-            {'post': post,
-                'form': PostForm(model_to_dict(post, exclude='image'))}
-        )
+        if request.method == 'GET':
+            return render(
+                request, 'post_form.html',
+                {'post': post,
+                 'form': PostForm(model_to_dict(post))}
+            )
 
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
+        if request.method == 'POST':
+            form = PostForm(request.POST, request.FILES, instance=post)
+            if form.is_valid():
+                form.save()
 
-            post = Post.m2m_from_form(form.cleaned_data, id=post_id)
-
-            return redirect('concrete_post', post_id=post_id)
+                return redirect('concrete_post', post_id=post_id)
 
     raise Http404
 
@@ -105,8 +110,7 @@ def add_post(request):
     if request.method == 'POST':
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
-
-            post = Post.m2m_from_form(form.cleaned_data)
+            post = form.save()
 
             return redirect('concrete_post', post_id=post.id)
 

@@ -32,7 +32,7 @@ class Post(models.Model):
         to=Category, default=None, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.header
+        return f'{self.header}   ---   {self.short_description}'
 
     @classmethod
     def m2m_from_form(self, cleaned_data, id=None):

@@ -36,7 +36,7 @@ def post_list(request):
                     if value
                 }
 
-                posts = posts.filter(**filter_dict)
+                posts = posts.filter(**filter_dict).distinct()
 
         return render(
             request, 'post_list.html',

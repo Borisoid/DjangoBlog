@@ -49,7 +49,7 @@ def post_list(request):
 
         return render(
             request, 'post_list.html',
-            {'posts': posts.all(), 'form': SearchForm()}
+            {'posts': posts.all(), 'form': search_form}
         )
 
     return HttpResponseBadRequest

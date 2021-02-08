@@ -13,10 +13,14 @@
     <hr>
     
     {% if posts %}
+    <ol>
         {% for post in posts %}
-        <a href="{% url 'concrete_post' post_id=post.id %}">{{ post }}</a>
-        <hr>
+        <li>
+            <a href="{% url 'concrete_post' post_id=post.id %}">{{ post }}</a>
+            <hr>
+        </li>
         {% endfor %}
+    </ol>
     {% else %}
         Nothing found
     {% endif %}

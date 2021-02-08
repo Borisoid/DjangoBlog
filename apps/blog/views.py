@@ -40,25 +40,19 @@ def post_list(request):
                     | Q(short_description__icontains=search_keywords)
                 )
 
-            if filter_dict.get('tags'):
-                tags = filter_dict.pop('tags')
+            tags = filter_dict.pop('tags', None)
+            if tags:
                 posts = posts\
                     .filter(tags__in=tags)\
                     .annotate(num_tags=Count('tags'))\
                     .filter(num_tags__gte=len(tags))
 
-            # if filter_dict.get('tags'):
-            #     filter_dict['tags__in'] = filter_dict.pop('tags')
-
             posts = posts.filter(**filter_dict).distinct()
 
-        else:
-            return HttpResponseBadRequest
-
-        return render(
-            request, 'post_list.html',
-            {'posts': posts.all(), 'form': search_form}
-        )
+            return render(
+                request, 'post_list.html',
+                {'posts': posts.all(), 'form': search_form}
+            )
 
     return HttpResponseBadRequest
 

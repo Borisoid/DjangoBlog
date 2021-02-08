@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.http.response import HttpResponseBadRequest
 from django.shortcuts import (
     render,
@@ -40,7 +41,14 @@ def post_list(request):
                 )
 
             if filter_dict.get('tags'):
-                filter_dict['tags__in'] = filter_dict.pop('tags')
+                tags = filter_dict.pop('tags')
+                posts = posts\
+                    .filter(tags__in=tags)\
+                    .annotate(num_tags=Count('tags'))\
+                    .filter(num_tags__gte=len(tags))
+
+            # if filter_dict.get('tags'):
+            #     filter_dict['tags__in'] = filter_dict.pop('tags')
 
             posts = posts.filter(**filter_dict).distinct()
 

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block header %}
+
+<header style="display: flex;">
+    <a href="{% url 'post_list' %}">Post list</a>
+    <a href="{% url 'add_post' %}">Add post</a>
+    <a href="{% url 'user_logout' %}" style="margin-left: auto;">Log in/out</a>
+</header>
+
+{% endblock %}

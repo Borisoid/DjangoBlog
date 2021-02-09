@@ -6,11 +6,9 @@
     <title>{% block title %}BASE{% endblock %}</title>
 </head>
 <body>
-    
-    <header>
-        <a href="{% url 'post_list' %}">Post list</a>
-        <a href="{% url 'add_post' %}">Add post</a>
-    </header>
+
+    {% block header %}
+    {% endblock %}
 
     {% block content %}
     {% endblock %}

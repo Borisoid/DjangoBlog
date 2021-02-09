@@ -7,6 +7,7 @@ from django.shortcuts import (
 from django.http import Http404
 from django.forms.models import model_to_dict
 from django.db.models import Q
+from django.core.exceptions import PermissionDenied
 
 from .models import (
     Post,
@@ -54,7 +55,7 @@ def post_list(request):
                 {'posts': posts.all(), 'form': search_form}
             )
 
-    return HttpResponseBadRequest
+    return HttpResponseBadRequest()
 
 
 def concrete_post(request, post_id: int):
@@ -63,17 +64,20 @@ def concrete_post(request, post_id: int):
     if post:
 
         if request.method == 'GET':
-
             form = DeleteForm()
             return render(
                 request, 'concrete_post.html',
                 {'post': post, 'delete_form': form}
             )
 
+        return HttpResponseBadRequest()
+
     raise Http404
 
 
 def delete_post(request, post_id: int):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
 
     if request.method == 'POST':
         Post.objects.filter(id=post_id).delete()
@@ -84,6 +88,8 @@ def delete_post(request, post_id: int):
 
 
 def edit_post(request, post_id: int):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
 
     post: Post = Post.objects.filter(id=post_id).first()
     if post:
@@ -102,10 +108,15 @@ def edit_post(request, post_id: int):
 
                 return redirect('concrete_post', post_id=post_id)
 
+        return HttpResponseBadRequest()
+
     raise Http404
 
 
 def add_post(request):
+    if not request.user.is_authenticated:
+        raise PermissionDenied
+
     if request.method == 'GET':
         return render(request, 'post_form.html', {'post_form': PostForm()})
 
@@ -116,4 +127,4 @@ def add_post(request):
 
             return redirect('concrete_post', post_id=post.id)
 
-    raise Http404
+    return HttpResponseBadRequest()

@@ -23,7 +23,9 @@ from .forms import (
 def post_list(request):
     if request.method == 'GET':
 
-        posts = Post.objects
+        posts = Post.objects\
+            .prefetch_related('tags')\
+            .select_related('category')\
 
         search_form = SearchForm(request.GET)
         if search_form.is_valid():

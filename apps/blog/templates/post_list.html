@@ -16,7 +16,15 @@
     <ol>
         {% for post in posts %}
         <li>
-            <a href="{% url 'concrete_post' post_id=post.id %}">{{ post }}</a>
+            <a href="{% url 'concrete_post' post_id=post.id %}">
+                Header - {{ post.header }}
+                | Short description - {{ post.short_description }}
+                | Categoty - {{ post.category }}
+                | Tags - 
+                {% for tag in post.tags.all %}
+                    {{ tag }}
+                {% endfor %}
+            </a>
             <hr>
         </li>
         {% endfor %}

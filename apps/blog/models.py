@@ -32,11 +32,4 @@ class Post(models.Model):
         to=Category, default=None, on_delete=models.CASCADE)
 
     def __str__(self):
-        tag_names = ', '.join(list(
-            map(lambda tag: tag.name,
-                Post.objects.filter(id=self.id).first().tags.all())
-        ))
-        return f'''Header - {self.header}
-            | Short description - {self.short_description}
-            | Category - {self.category}
-            | Tags - {tag_names}'''
+        return f'''Header - {self.header}'''

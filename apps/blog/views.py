@@ -1,15 +1,25 @@
-from django.db.models import Count
-from django.http.response import HttpResponseBadRequest
-from django.shortcuts import (
-    render,
-    redirect,
+from django.contrib.auth.decorators import (
+    login_required,
 )
-from django.http import Http404
-from django.forms.models import model_to_dict
-from django.db.models import Q
-
-from .models import (
-    Post,
+from django.core.exceptions import (  # noqa
+    PermissionDenied,
+)
+from django.db.models import (
+    Count,
+    Q,
+)
+from django.forms.models import (
+    model_to_dict,
+)
+from django.http import (
+    Http404,
+)
+from django.http.response import (
+    HttpResponseBadRequest,
+)
+from django.shortcuts import (
+    redirect,
+    render,
 )
 
 from .forms import (
@@ -17,12 +27,17 @@ from .forms import (
     PostForm,
     SearchForm,
 )
+from .models import (
+    Post,
+)
 
 
 def post_list(request):
     if request.method == 'GET':
 
-        posts = Post.objects
+        posts = Post.objects \
+                    .prefetch_related('tags') \
+                    .select_related('category')
 
         search_form = SearchForm(request.GET)
         if search_form.is_valid():
@@ -42,9 +57,9 @@ def post_list(request):
 
             tags = filter_dict.pop('tags', None)
             if tags:
-                posts = posts\
-                    .filter(tags__in=tags)\
-                    .annotate(num_tags=Count('tags'))\
+                posts = posts \
+                    .filter(tags__in=tags) \
+                    .annotate(num_tags=Count('tags')) \
                     .filter(num_tags__gte=len(tags))
 
             posts = posts.filter(**filter_dict).distinct()
@@ -54,25 +69,29 @@ def post_list(request):
                 {'posts': posts.all(), 'form': search_form}
             )
 
-    return HttpResponseBadRequest
+    return HttpResponseBadRequest()
 
 
 def concrete_post(request, post_id: int):
 
-    post = Post.objects.filter(id=post_id).first()
+    post = Post.objects.filter(id=post_id) \
+                       .prefetch_related('tags', 'category') \
+                       .first()
     if post:
 
         if request.method == 'GET':
-
             form = DeleteForm()
             return render(
                 request, 'concrete_post.html',
                 {'post': post, 'delete_form': form}
             )
 
+        return HttpResponseBadRequest()
+
     raise Http404
 
 
+@login_required()
 def delete_post(request, post_id: int):
 
     if request.method == 'POST':
@@ -83,9 +102,12 @@ def delete_post(request, post_id: int):
     raise Http404
 
 
+@login_required()
 def edit_post(request, post_id: int):
 
-    post: Post = Post.objects.filter(id=post_id).first()
+    post = Post.objects.filter(id=post_id) \
+                       .prefetch_related('tags', 'category') \
+                       .first()
     if post:
 
         if request.method == 'GET':
@@ -102,10 +124,14 @@ def edit_post(request, post_id: int):
 
                 return redirect('concrete_post', post_id=post_id)
 
+        return HttpResponseBadRequest()
+
     raise Http404
 
 
+@login_required
 def add_post(request):
+
     if request.method == 'GET':
         return render(request, 'post_form.html', {'post_form': PostForm()})
 
@@ -116,4 +142,4 @@ def add_post(request):
 
             return redirect('concrete_post', post_id=post.id)
 
-    raise Http404
+    return HttpResponseBadRequest()

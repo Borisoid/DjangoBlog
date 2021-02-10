@@ -25,7 +25,7 @@ def custom_login(request):
             if user:
                 login(request, user)
 
-                return redirect('post_list')
+                return redirect(request.GET.get('next', 'post_list'))
 
         return render(request, 'login.html',
                       {'is_invalid': True, 'form': form})
@@ -35,4 +35,13 @@ def custom_logout(request):
     if request.user.is_authenticated:
         logout(request)
 
-    return redirect('user_login')
+    return redirect('post_list')
+
+
+def log_in_out(request):
+    if request.user.is_authenticated:
+        return redirect('user_logout')
+
+    else:
+        return redirect('user_login')
+        

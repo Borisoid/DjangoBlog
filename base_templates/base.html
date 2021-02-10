@@ -7,8 +7,15 @@
 </head>
 <body>
 
-    {% block header %}
-    {% endblock %}
+    <header style="display: flex;">
+        <!-- <a href="{% url 'post_list' %}">Post list</a>
+        <a href="{% url 'add_post' %}">Add post</a> -->
+        {% block header_content %}
+        {% endblock %}
+    
+        <a href="{% url 'user_log_in_out' %}" style="margin-left: auto;">Log in/out</a>
+    
+    </header>
 
     {% block content %}
     {% endblock %}

@@ -128,6 +128,8 @@ STATICFILES_DIRS = (
     BASE_DIR / 'static',
 )
 
+LOGIN_URL = '/login/'
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
